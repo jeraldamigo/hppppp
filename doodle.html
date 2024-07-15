@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doodle Canvas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 20px;
+        }
+        #canvas {
+            border: 1px solid black;
+            touch-action: none;
+            margin-bottom: 10px;
+        }
+        button {
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Draw Your Doodle Here:</h2>
+    <canvas id="canvas" width="300" height="300"></canvas>
+    <br>
+    <button onclick="clearCanvas()">Clear</button>
+    <button onclick="saveCanvas()">Save</button>
+    <input type="hidden" id="doodleData" name="doodleData">
+    <br>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let drawing = false;
+
+        // Touch events
+        canvas.addEventListener('touchstart', startDrawing, false);
+        canvas.addEventListener('touchmove', draw, false);
+        canvas.addEventListener('touchend', stopDrawing, false);
+
+        // Mouse events
+        canvas.addEventListener('mousedown', startDrawing, false);
+        canvas.addEventListener('mousemove', draw, false);
+        canvas.addEventListener('mouseup', stopDrawing, false);
+        canvas.addEventListener('mouseout', stopDrawing, false);
+
+        function startDrawing(e) {
+            drawing = true;
+            draw(e);
+        }
+
+        function draw(e) {
+            if (!drawing) return;
+            e.preventDefault();
+
+            const rect = canvas.getBoundingClientRect();
+            let x, y;
+            if (e.touches) {
+                x = e.touches[0].clientX - rect.left;
+                y = e.touches[0].clientY - rect.top;
+            } else {
+                x = e.clientX - rect.left;
+                y = e.clientY - rect.top;
+            }
+
+            ctx.lineWidth = 3;
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = 'black';
+
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+        }
+
+        function stopDrawing() {
+            drawing = false;
+            ctx.beginPath();
+        }
+
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function saveCanvas() {
+            const dataURL = canvas.toDataURL('image/png');
+            document.getElementById('doodleData').value = dataURL;
+            alert('Doodle saved! Now you can submit the form.');
+        }
+    </script>
+</body>
+</html>
